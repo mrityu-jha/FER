@@ -85,8 +85,6 @@ def train():
     Y = data_frame[['Label']].copy()
     num_fold = 1
     data = dict()
-    val_accuracy = []
-    val_loss = []
 
     for train_idx, val_idx in return_split( Y ):
         train_df = data_frame.iloc[train_idx]
@@ -146,8 +144,6 @@ def train():
         results = dict( zip( model.metrics_name, results ) )
 
         data[num_fold] = [ train_data, val_data ]
-        val_accuracy.append( results[ 'accuracy' ] )
-        val_loss.append( results['loss'] )
         num_fold += 1
         tf.keras.backend.clear_session()
 
@@ -195,6 +191,8 @@ def fine_tune( num_fold, data ):
         callbacks = [ mc, reduce_lr ],
         steps_per_epoch = train_data.__len__()
     )
+    plot.plot_loss( history )
+    plot.plot_accuracy( history )
 
 
 
