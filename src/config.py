@@ -3,10 +3,11 @@ import keras
 import os 
 
 ROOT_DIR = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition"
+
 INPUT = os.path.join( ROOT_DIR, 'input' ) 
-#"M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/"
+#INPUT = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/"
 TRAIN_PATH = os.path.join( INPUT, 'combined_train' )    
-#"M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/combined_train/"
+#TRAIN_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/combined_train/"
 CSV_PATH = os.path.join( INPUT, 'train.csv' )
 #CSV_PATH = os."M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/train.csv"
 TEST_PATH = os.path.join( INPUT, 'test' )

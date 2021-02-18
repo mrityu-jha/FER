@@ -14,7 +14,7 @@ def irnv2( TARGET_SIZE ):
     x = base_model( base_model.inputs, training = False )
     x = Dropout( 0.5 )( x )
     x = Dense( 128, activation = 'relu' )( x )
-    outputs = Dense( 6, activation = 'softmax' )( x )
+    outputs = Dense( config.NUM_CLASSES, activation = 'softmax' )( x )
     return keras.Model( inputs, outputs )
 
 def xception( TARGET_SIZE ):
@@ -25,7 +25,7 @@ def xception( TARGET_SIZE ):
     x = base_model( base_model.inputs, training = False )
     x = Dropout( 0.5 )( x )
     x = Dense( 128, activation = 'relu' )( x )
-    outputs = Dense( 6, activation = 'softmax' )( x )
+    outputs = Dense( config.NUM_CLASSES, activation = 'softmax' )( x )
     return keras.Model( inputs, outputs )
 
 # def model_dict( TARGET_SIZE = config.TARGET_SIZE ):
@@ -36,11 +36,9 @@ def xception( TARGET_SIZE ):
 def return_model( name_of_model ):
     if name_of_model == 'xception':
         return xception( config.TARGET_SIZE )
-    
+
     elif name_of_model == 'irnv2':
         return irnv2( config.TARGET_SIZE )
 
     else:
         print( 'Invalid Model Name' )
-
-    

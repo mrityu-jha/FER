@@ -83,7 +83,7 @@ def train():
     print( 'Starting Training' )
     data_frame = pd.read_csv( config.CSV_PATH, dtype = str )
     Y = data_frame[['Label']].copy()
-    num_fold = 1     
+    num_fold = 1
     data = dict()
     val_accuracy = []
     val_loss = []
@@ -99,7 +99,7 @@ def train():
             directory = config.TRAIN_PATH,
             x_col = "Image",
             y_col = "Label",
-            target_size = config.TARGET_SIZE,
+            target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] )
             class_mode = "categorical",
             shuffle = True,
             batch_size = config.BATCH_SIZE,
@@ -111,7 +111,7 @@ def train():
             directory = config.TRAIN_PATH,
             x_col = "Image",
             y_col = "Label",
-            target_size = config.TARGET_SIZE,
+            target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] ),
             class_mode = "categorical",
             shuffle = True,
             batch_size = config.BATCH_SIZE,
@@ -120,8 +120,8 @@ def train():
 
         model = model_dispatcher.return_model( name_of_model )
         mc, reduce_lr = return_callbacks(
-            name_of_model,
-            num_fold
+            num_fold,
+            False
         )
 
         opt = return_opt( 'adam', learning_rate = 0.01 )
@@ -165,7 +165,7 @@ def fine_tune( num_fold, data ):
     model = None
     train_data = None
     val_data = None
-    
+
     train_data, val_data = data[num_fold - 1][0], data[num_fold - 1][1]
     model = model_dispatcher.return_model(config.MODELS[num_fold - 1])
 
@@ -177,7 +177,7 @@ def fine_tune( num_fold, data ):
     print( model.summary() )
 
     mc, reduce_lr = return_callbacks(
-        config.MODELS[num_fold - 1],
+        num_fold,
         True
     )
 
@@ -204,5 +204,3 @@ if __name__ == '__main__':
     for name_of_model in config.MODELS:
         fine_tune( num_fold, data )
         num_fold += 1
-        
-    
