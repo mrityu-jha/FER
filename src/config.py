@@ -21,6 +21,8 @@ BATCH_SIZE = 64
 TARGET_SIZE = ( 224, 224, 3 )
 MODELS = [ 'irnv2', 'xception' ]
 NUM_SPLITS = 5
+NUM_CLASSES = 7
+
 
 LAYERS_TO_TRAIN = {
     'irnv2' : 774,

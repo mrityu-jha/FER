@@ -97,7 +97,7 @@ def train():
             directory = config.TRAIN_PATH,
             x_col = "Image",
             y_col = "Label",
-            target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] )
+            target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] ),
             class_mode = "categorical",
             shuffle = True,
             batch_size = config.BATCH_SIZE,
@@ -132,7 +132,7 @@ def train():
         history = model.fit(
             train_data,
             validation_data = val_data,
-            eopchs = 1,
+            epochs = 1,
             callbacks = [ mc, reduce_lr ],
             steps_per_epoch = train_data.__len__()
         )
@@ -187,7 +187,7 @@ def fine_tune( num_fold, data ):
     history = model.fit(
         train_data,
         validation_data = val_data,
-        eopchs = 20,
+        epochs = 20,
         callbacks = [ mc, reduce_lr ],
         steps_per_epoch = train_data.__len__()
     )
