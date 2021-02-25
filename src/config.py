@@ -1,6 +1,8 @@
 import tensorflow as tf
 import keras 
 import os 
+import preprocess
+
 
 ROOT_DIR = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition"
 
@@ -18,17 +20,20 @@ SAVE_MODEL = os.path.join( INPUT, 'models' )
 #SAVE_MODEL = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/models/"
 
 BATCH_SIZE = 64
-TARGET_SIZE = ( 224, 224, 3 )
-MODELS = [ 'irnv2', 'xception' ]
+TARGET_SIZE = ( 197, 197, 3 )
+#MODELS = [ 'irnv2', 'xception', 'resnet50' ]
+MODELS = [ 'resnet50' ]
 NUM_SPLITS = 5
 NUM_CLASSES = 7
 
 
 LAYERS_TO_TRAIN = {
     'irnv2' : 774,
-    'xception' : 126
+    'xception' : 126,
+    'resnet50' : None
 }
 processing_function = {
-    MODELS[0] : tf.keras.applications.inception_resnet_v2.preprocess_input,
-    MODELS[1] : tf.keras.applications.xception.preprocess_input
+    'irnv2' : preprocess.irnv2,
+    'xception' : preprocess.xception,
+    'resnet50' : preprocess.resnet50
 }

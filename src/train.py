@@ -23,14 +23,14 @@ def return_split( Y ):
         yield train_idx, val_idx
 
 
-def return_gen( name_of_model ):
-    print( 'Returning Generators for:', name_of_model )
+def return_gen( num_fold ):
+    print( 'Returning Generators for:', config.MODELS[ num_fold - 1 ] )
     train_datagen = ImageDataGenerator(
-        preprocessing_function = config.processing_function[ name_of_model ]
+        preprocessing_function=config.processing_function[config.MODELS[num_fold - 1]]
     )
 
     val_datagen = ImageDataGenerator(
-        preprocessing_function = config.processing_function[ name_of_model ]
+        preprocessing_function=config.processing_function[config.MODELS[num_fold - 1]]
     )
 
     return train_datagen, val_datagen
@@ -89,8 +89,7 @@ def train():
     for train_idx, val_idx in return_split( Y ):
         train_df = data_frame.iloc[train_idx]
         val_df = data_frame.iloc[val_idx]
-        name_of_model = config.MODELS[ num_fold - 1 ]
-        train_datagen, val_datagen = return_gen( name_of_model )
+        train_datagen, val_datagen = return_gen( num_fold )
 
         train_data = train_datagen.flow_from_dataframe(
             dataframe = train_df,
@@ -102,7 +101,7 @@ def train():
             shuffle = True,
             batch_size = config.BATCH_SIZE,
             seed = 42
-         )
+        )
 
         val_data = val_datagen.flow_from_dataframe(
             dataframe = val_df,
@@ -115,8 +114,8 @@ def train():
             batch_size = config.BATCH_SIZE,
             seed = 42
         )
-
-        model = model_dispatcher.return_model( name_of_model )
+        
+        model = model_dispatcher.return_model( num_fold )
         mc, reduce_lr = return_callbacks(
             num_fold,
             False
@@ -147,7 +146,7 @@ def train():
         num_fold += 1
         tf.keras.backend.clear_session()
 
-        if( num_fold >= 3 ):
+        if( num_fold > len( config.MODELS ) ):
             break
 
     return data
@@ -168,7 +167,7 @@ def fine_tune( num_fold, data ):
     model.load_weights(get_model_name(num_fold))
     #LAYERS_TO_TRAIN = some_arbitrary_value
     print( model.summary() )
-    for layers in model.layers[1].layers[config.LAYERS_TO_TRAIN[name_of_model]:]:
+    for layers in model.layers[1].layers[config.LAYERS_TO_TRAIN[config.MODELS[num_fold - 1]]:]:
         layers.trainable = True
     print( model.summary() )
 
@@ -199,6 +198,6 @@ def fine_tune( num_fold, data ):
 if __name__ == '__main__':
     data = train()
     num_fold = 1
-    for name_of_model in config.MODELS:
+    for _ in config.MODELS:
         fine_tune( num_fold, data )
         num_fold += 1
