@@ -1,6 +1,6 @@
 # FER Codes and Datasets
 
-The scripts are written are portable enough to be shifted to any other system without any changes. 
+The scripts are portable enough to be shifted to any other system without any changes. 
 
 The steps to be followed to emulate the codes are:
 
