@@ -7,9 +7,8 @@ import keras
 import os
 from keras.models import Sequential, load_model
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold
 import config
 import model_dispatcher
 import plot
@@ -38,9 +37,9 @@ def return_gen( num_fold ):
 def get_model_name( num_fold, isBest = False ):
     print( 'Num-Fold:', num_fold, 'Model Name:', config.MODELS[ num_fold - 1 ], 'isBest:', str( isBest ) )
     if isBest:
-        return os.path.join( config.SAVE_MODEL, 'best_' + config.MODELS[ num_fold - 1 ] + '_' + str( num_fold ) + '.h5' )
+        return os.path.join( config.SAVE_MODEL, 'best_' + config.MODELS[ num_fold - 1 ] + '_' + str( num_fold ) )
     else:
-        return os.path.join( config.SAVE_MODEL, config.MODELS[num_fold - 1] + '_' + str( num_fold ) + '.h5' )
+        return os.path.join( config.SAVE_MODEL, config.MODELS[num_fold - 1] + '_' + str( num_fold ) )
 
 
 def return_callbacks( num_fold, isBest = False ):
@@ -50,7 +49,8 @@ def return_callbacks( num_fold, isBest = False ):
         monitor = 'val_accuracy',
         mode = 'max',
         verbose = 1,
-        save_best_only = True
+        save_best_only = True,
+        save_weights_only = False
     )
 
     reduce_lr = ReduceLROnPlateau(
@@ -81,10 +81,11 @@ def return_opt( opt_name, learning_rate ):
 
 def train():
     print( 'Starting Training' )
-    data_frame = pd.read_csv( config.CSV_PATH, dtype = str )
+    data_frame = pd.read_csv(config.TRAIN_CSV_PATH)
     Y = data_frame[['Label']].copy()
     num_fold = 1
     data = dict()
+    isBest = False
 
     for train_idx, val_idx in return_split( Y ):
         train_df = data_frame.iloc[train_idx]
@@ -93,7 +94,7 @@ def train():
 
         train_data = train_datagen.flow_from_dataframe(
             dataframe = train_df,
-            directory = config.TRAIN_PATH,
+            directory = None,
             x_col = "Image",
             y_col = "Label",
             target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] ),
@@ -105,7 +106,7 @@ def train():
 
         val_data = val_datagen.flow_from_dataframe(
             dataframe = val_df,
-            directory = config.TRAIN_PATH,
+            directory = None,
             x_col = "Image",
             y_col = "Label",
             target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] ),
@@ -114,11 +115,11 @@ def train():
             batch_size = config.BATCH_SIZE,
             seed = 42
         )
-        
+        print( train_data.class_indices )
         model = model_dispatcher.return_model( num_fold )
         mc, reduce_lr = return_callbacks(
             num_fold,
-            False
+            isBest
         )
 
         opt = return_opt( 'adam', learning_rate = 0.01 )
@@ -138,7 +139,7 @@ def train():
 
         plot.plot_loss( history )
         plot.plot_accuracy( history )
-        model.load_weights( get_model_name(num_fold) )
+        model = load_model(get_model_name(num_fold, isBest))
         results = model.evaluate( val_data )
         results = dict( zip( model.metrics_name, results ) )
 
@@ -160,11 +161,12 @@ def fine_tune( num_fold, data ):
     model = None
     train_data = None
     val_data = None
+    isBest = True
 
     train_data, val_data = data[num_fold - 1][0], data[num_fold - 1][1]
     model = model_dispatcher.return_model(config.MODELS[num_fold - 1])
 
-    model.load_weights(get_model_name(num_fold))
+    model = load_model(get_model_name(num_fold))
     #LAYERS_TO_TRAIN = some_arbitrary_value
     print( model.summary() )
     for layers in model.layers[1].layers[config.LAYERS_TO_TRAIN[config.MODELS[num_fold - 1]]:]:
@@ -173,7 +175,7 @@ def fine_tune( num_fold, data ):
 
     mc, reduce_lr = return_callbacks(
         num_fold,
-        True
+        isBest
     )
 
     opt = return_opt( 'adam', learning_rate = 1e-5 )
@@ -192,7 +194,6 @@ def fine_tune( num_fold, data ):
     )
     plot.plot_loss( history )
     plot.plot_accuracy( history )
-
 
 
 if __name__ == '__main__':

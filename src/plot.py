@@ -27,3 +27,8 @@ def plot_accuracy( history ):
     plt.yticks(fontsize = 14 )
     plt.legend( ['Train Set', 'Val Set'], loc='best', fontsize = 14 )
     plt.show()
+
+
+def plot_confusionMatrix( cf_matrix ):
+    sns.heatmap( cf_matrix, annot = True, cmap = 'Blues', fmt = 'g' )
+    plt.show()

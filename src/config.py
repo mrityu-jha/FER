@@ -8,23 +8,27 @@ ROOT_DIR = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Re
 
 INPUT = os.path.join( ROOT_DIR, 'input' ) 
 #INPUT = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/"
-TRAIN_PATH = os.path.join( INPUT, 'combined_train' )    
-#TRAIN_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/combined_train/"
-CSV_PATH = os.path.join( INPUT, 'train.csv' )
-#CSV_PATH = os."M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/train.csv"
+TRAIN_PATH = os.path.join(INPUT, 'train')
+#TRAIN_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/train"
+TRAIN_CSV_PATH = os.path.join( INPUT, 'train.csv' )
+#TRAIN_CSV_PATH = os."M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/train.csv"
 TEST_PATH = os.path.join( INPUT, 'test' )
-#TEST_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/test/"
-IMG_PATH = os.path.join( INPUT, 'train' )
-#IMG_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/train/"
-SAVE_MODEL = os.path.join( INPUT, 'models' )
-#SAVE_MODEL = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/models/"
+#TEST_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/test"
+TEST_CSV_PATH = os.path.join( INPUT, 'test.csv' )
+#TEST_CSV_PATH = os."M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/test.csv"
+SAVE_MODEL = os.path.join( ROOT_DIR, 'models' )
+#SAVE_MODEL = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/models"
 
 BATCH_SIZE = 64
 TARGET_SIZE = ( 197, 197, 3 )
-#MODELS = [ 'irnv2', 'xception', 'resnet50' ]
-MODELS = [ 'resnet50' ]
+MODELS = [ 'irnv2', 'xception', 'resnet50' ]
+#MODELS = [ 'resnet50' ]
 NUM_SPLITS = 5
-NUM_CLASSES = 7
+
+CLASS_LABEL = {'angry': 0, 'disgust': 1, 'fear': 2,
+               'happy': 3, 'sad': 4, 'surprise': 5, 'neutral': 6, }
+
+NUM_CLASSES = len( CLASS_LABEL )
 
 
 LAYERS_TO_TRAIN = {

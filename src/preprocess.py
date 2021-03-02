@@ -12,4 +12,5 @@ def xception( input_img ):
 
 def resnet50( input_img ):
     input_img -= 128.8006
+    input_img /= 64.6497
     return input_img
