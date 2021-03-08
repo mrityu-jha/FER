@@ -5,7 +5,7 @@ import tensorflow as tf
 import numpy as np
 import keras
 import os
-from keras.models import Sequential, load_model
+from keras.models import load_model
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import StratifiedKFold
@@ -25,11 +25,11 @@ def return_split( Y ):
 def return_gen( num_fold ):
     print( 'Returning Generators for:', config.MODELS[ num_fold - 1 ] )
     train_datagen = ImageDataGenerator(
-        preprocessing_function=config.processing_function[config.MODELS[num_fold - 1]]
+        preprocessing_function=config.preprocessing_function[config.MODELS[num_fold - 1]]
     )
 
     val_datagen = ImageDataGenerator(
-        preprocessing_function=config.processing_function[config.MODELS[num_fold - 1]]
+        preprocessing_function=config.preprocessing_function[config.MODELS[num_fold - 1]]
     )
 
     return train_datagen, val_datagen
@@ -86,67 +86,70 @@ def train():
     num_fold = 1
     data = dict()
     isBest = False
-
     for train_idx, val_idx in return_split( Y ):
-        train_df = data_frame.iloc[train_idx]
-        val_df = data_frame.iloc[val_idx]
-        train_datagen, val_datagen = return_gen( num_fold )
+        if(num_fold in config.LIST_OF_FOLD_EXCEPTIONS):
+            import train_facialLandmarks
+            train_facialLandmarks.train( num_fold )
+        else:
+            train_df = data_frame.iloc[train_idx]
+            val_df = data_frame.iloc[val_idx]
+            train_datagen, val_datagen = return_gen( num_fold )
 
-        train_data = train_datagen.flow_from_dataframe(
-            dataframe = train_df,
-            directory = None,
-            x_col = "Image",
-            y_col = "Label",
-            target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] ),
-            class_mode = "categorical",
-            shuffle = True,
-            batch_size = config.BATCH_SIZE,
-            seed = 42
-        )
+            train_data = train_datagen.flow_from_dataframe(
+                dataframe = train_df,
+                directory = None,
+                x_col = "Image",
+                y_col = "Label",
+                target_size=(config.TARGET_SIZE[config.MODELS[num_fold-1]][0], config.TARGET_SIZE[config.MODELS[num_fold-1]][1]),
+                class_mode = "categorical",
+                shuffle = True,
+                batch_size = config.BATCH_SIZE,
+                seed = 42
+            )
 
-        val_data = val_datagen.flow_from_dataframe(
-            dataframe = val_df,
-            directory = None,
-            x_col = "Image",
-            y_col = "Label",
-            target_size = ( config.TARGET_SIZE[0], config.TARGET_SIZE[1] ),
-            class_mode = "categorical",
-            shuffle = True,
-            batch_size = config.BATCH_SIZE,
-            seed = 42
-        )
-        print( train_data.class_indices )
-        model = model_dispatcher.return_model( num_fold )
-        mc, reduce_lr = return_callbacks(
-            num_fold,
-            isBest
-        )
+            val_data = val_datagen.flow_from_dataframe(
+                dataframe = val_df,
+                directory = None,
+                x_col = "Image",
+                y_col = "Label",
+                target_size=(config.TARGET_SIZE[config.MODELS[num_fold-1]][0], config.TARGET_SIZE[config.MODELS[num_fold-1]][1]),
+                class_mode = "categorical",
+                shuffle = True,
+                batch_size = config.BATCH_SIZE,
+                seed = 42
+            )
+            print( train_data.class_indices )
+            model = model_dispatcher.return_model( num_fold )
+            mc, reduce_lr = return_callbacks(
+                num_fold,
+                isBest
+            )
 
-        opt = return_opt( 'adam', learning_rate = 0.01 )
-        model.compile(
-            optimizer = opt,
-            loss = 'categorical_crossentropy',
-            metrics = ['accuracy']
-        )
+            opt = return_opt( 'adam', learning_rate = 0.01 )
+            model.compile(
+                optimizer = opt,
+                loss = 'categorical_crossentropy',
+                metrics = ['accuracy']
+            )
 
-        history = model.fit(
-            train_data,
-            validation_data = val_data,
-            epochs = 1,
-            callbacks = [ mc, reduce_lr ],
-            steps_per_epoch = train_data.__len__()
-        )
+            history = model.fit(
+                train_data,
+                validation_data = val_data,
+                epochs = 1,
+                callbacks = [ mc, reduce_lr ],
+                steps_per_epoch = train_data.__len__()
+            )
 
-        plot.plot_loss( history )
-        plot.plot_accuracy( history )
-        model = load_model(get_model_name(num_fold, isBest))
-        results = model.evaluate( val_data )
-        results = dict( zip( model.metrics_name, results ) )
+            plot.plot_loss( history )
+            plot.plot_accuracy( history )
+            model = load_model(get_model_name(num_fold, isBest))
+            results = model.evaluate( val_data )
+            results = dict( zip( model.metrics_name, results ) )
 
-        data[num_fold] = [ train_data, val_data ]
+            data[num_fold] = [ train_data, val_data ]
+
         num_fold += 1
         tf.keras.backend.clear_session()
-
         if( num_fold > len( config.MODELS ) ):
             break
 
