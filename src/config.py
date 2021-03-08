@@ -1,9 +1,9 @@
-import os 
+import os
 import preprocess
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)).split( 'src' )[0]
 #ROOT_DIR = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition"
-INPUT = os.path.join( ROOT_DIR, 'input' ) 
+INPUT = os.path.join( ROOT_DIR, 'input' )
 #INPUT = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input"
 TRAIN_PATH = os.path.join(INPUT, 'train')
 #TRAIN_PATH = "M:/My Files/Mrityunjay Jha/Programming/MIBM Lab/Facial Expression Recognition/input/train"
