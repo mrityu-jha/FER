@@ -1,0 +1,9 @@
+
+models/best_resnet50_preTrained/variables/variables.data-00000-of-00001
+input/dats/shape_predictor_68_face_landmarks.dat
+models/best_custom_facialLandmarks_1/saved_model.pb
+*.index
+src/__pycache__/train.cpython-37.pyc
+models/best_resnet50_preTrained/saved_model.pb
+src/__pycache__/train_facialLandmarks.cpython-37.pyc
+models/best_custom_facialLandmarks_1/variables/variables.data-00000-of-00001
